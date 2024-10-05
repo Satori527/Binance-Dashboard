@@ -5,12 +5,23 @@ import './Dashboard.css';
 
 function Dashboard() {
     const chartContainerRef = useRef();
+
+    const Coins = ["ethusdt", "bnbusdt", "dotusdt"];
+    const Intervals = ["1m", "3m", "5m"];
     
-    let [formattedData, setFormattedData] = useState([])
+    //let [formattedData, setFormattedData] = useState([])
     const [symbol, setSymbol] = useState("ethusdt");
     const [interval, setInterval] = useState("1m");
     let history = [];
-    //localStorage.removeItem("StoredHistory");
+    // localStorage.removeItem("StoredHistory_ethusdt_1m");
+    // localStorage.removeItem("StoredHistory_ethusdt_3m");
+    // localStorage.removeItem("StoredHistory_ethusdt_5m");
+    // localStorage.removeItem("StoredHistory_bnbusdt_1m");
+    // localStorage.removeItem("StoredHistory_bnbusdt_3m");
+    // localStorage.removeItem("StoredHistory_bnbusdt_5m");
+    // localStorage.removeItem("StoredHistory_dotusdt_1m");
+    // localStorage.removeItem("StoredHistory_dotusdt_3m");
+    // localStorage.removeItem("StoredHistory_dotusdt_5m");
     let prevStoredData = localStorage.getItem(`StoredHistory_${symbol}_${interval}`);
     if(prevStoredData){
         history = JSON.parse(prevStoredData);
@@ -127,7 +138,7 @@ function Dashboard() {
                 chart.applyOptions({ width: chartContainerRef.current.clientWidth });
             };
 
-            console.log(formattedData);
+            
 
             const chart = createChart(chartContainerRef.current, {
                 layout: {
@@ -181,7 +192,7 @@ function Dashboard() {
                 high: parseFloat(sd.k.h),
                 low: parseFloat(sd.k.l),
                 close: parseFloat(sd.k.c),
-                time: sd.k.t
+                time: (sd.k.t)/1000
             }
 
             series.update(newData);
@@ -234,20 +245,25 @@ function Dashboard() {
     return (
         <div className="flex flex-row w-full h-svh text-white">
             <div className="w-1/12 h-full bg-gray-700 flex flex-col gap-4 p-2">
-                
-                    <label htmlFor="interval">Interval</label>
-                    <select id="interval" onChange={(e)=>setInterval(e.target.value)} className='text-black'>
-                        <option value="1m">1m</option>
-                        <option value="3m">3m</option>
-                        <option value="5m">5m</option>
-                    </select>
-                    
+                <div className="flex flex-col gap-1">
                     <label htmlFor="coin">Coin</label>
                     <select id="coin" onChange={e=>setSymbol(e.target.value)} className='text-black'>
-                        <option value="ethusdt">ETH/USDT</option>
-                        <option value="bnbusdt">BNB/USDT</option>
-                        <option value="dotusdt">DOT/USDT</option>
+                        {
+                            Coins.map((symbol)=><option key={symbol} value={symbol}>{symbol.toUpperCase()}</option>)
+                        }
                     </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <label htmlFor="interval">Interval</label>
+                    <select id="interval" onChange={(e)=>setInterval(e.target.value)} className='text-black'>
+                        {
+                            Intervals.map((interval)=><option key={interval} value={interval}>{interval}</option>)
+                        }
+                    </select>
+                </div>
+                
+                    
+                    
             </div>
 
             <div className="w-11/12 h-full bg-gray-800">
