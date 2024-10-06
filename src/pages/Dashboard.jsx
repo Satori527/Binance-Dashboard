@@ -1,5 +1,6 @@
 import { ColorType, createChart, CrosshairMode } from 'lightweight-charts';
 import { useEffect, useRef, useState } from 'react';
+
 import './Dashboard.css';
 ;
 
@@ -31,7 +32,20 @@ function Dashboard() {
         console.log("prevhistory ",history);
     }
 
-    
+    const handleClearHistoryCurrent = () => {
+        Coins.forEach((coin) => {
+            Intervals.forEach((interval) => {
+                localStorage.removeItem(`StoredHistory_${coin}_${interval}`);
+                history = [];
+                prevStoredData = "";
+                window.location.reload();
+                
+
+            })
+        })
+        history = [];
+
+    }
 
 
     const handleSocketChange=(currency,interval) => {
@@ -121,18 +135,18 @@ function Dashboard() {
                 crosshair: {
                     mode: CrosshairMode.Normal,
                     vertLine: {
-                        color: 'rgba(197, 203, 206, 0.8)',
+                        color: 'rgba(197, 203, 206, 0.6)',
                         width: 1,
                         style: 0,
                         visible: true,
-                        labelBackgroundColor: 'rgba(197, 203, 206, 0.8)',
+                        labelBackgroundColor: 'rgba(160, 160, 500, 0.8)',
                     },
                     horzLine: {
-                        color: 'rgba(197, 203, 206, 0.8)',
+                        color: 'rgba(197, 203, 206, 0.6)',
                         width: 1,
                         style: 0,
                         visible: true,
-                        labelBackgroundColor: 'rgba(197, 203, 206, 0.8)',
+                        labelBackgroundColor: 'rgba(160, 160, 500, 0.8)',
                     },
                 },
                 priceScale: {
@@ -164,7 +178,7 @@ function Dashboard() {
             chart.timeScale().applyOptions({
                 rightOffset: 20,
                 barSpacing: 15,
-                fixLeftEdge: true,
+                
                 // tickMarkFormatter: (time,TickMarkType,locale) => {
                 //     const date = new Date(time*1000);
                 //     switch(TickMarkType){
@@ -256,6 +270,16 @@ function Dashboard() {
                         }
                     </select>
                 </div>
+                <div className="flex flex-col gap-4 my-4 text-white">
+                        <button className=" px-6 py-2 duration-200 bg-indigo-400 hover:bg-indigo-500 rounded text-center flex items-center justify-center" onClick={handleClearHistoryCurrent}>
+                            Delete History
+                        </button>
+                      
+                        
+                        {/* <button className="inline-block px-6 py-2 duration-200 bg-gray-300 hover:bg-gray-600 rounded-lg" onClick={() => chart.timeScale().scrollToRealTime()}>
+                            Go to realtime
+                        </button> */}
+                    </div>
                 
                     
                     
@@ -281,9 +305,8 @@ function Dashboard() {
                     </div> */}
 
                 </div>
-                    {/* <button className="inline-block px-6 py-2 duration-200 bg-gray-300 hover:bg-gray-600 rounded-lg" onClick={() => chart.timeScale().scrollToRealTime()}>
-                        Go to realtime
-                    </button> */}
+                    
+                    
                 </div>
             </div>
        
