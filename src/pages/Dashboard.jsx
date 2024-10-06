@@ -5,13 +5,16 @@ import './Dashboard.css';
 
 function Dashboard() {
     const chartContainerRef = useRef();
-
+    
+    const [priceColor, setPriceColor] = useState("gray");
     const Coins = ["ethusdt", "bnbusdt", "dotusdt"];
     const Intervals = ["1m", "3m", "5m"];
     
-    //let [formattedData, setFormattedData] = useState([])
+
     const [symbol, setSymbol] = useState("ethusdt");
     const [interval, setInterval] = useState("1m");
+
+    let [currentData, setCurrentData] = useState({});
     let history = [];
     // localStorage.removeItem("StoredHistory_ethusdt_1m");
     // localStorage.removeItem("StoredHistory_ethusdt_3m");
@@ -32,6 +35,7 @@ function Dashboard() {
 
 
     const handleSocketChange=(currency,interval) => {
+
         prevStoredData = localStorage.getItem(`StoredHistory_${symbol}_${interval}`);
         if(prevStoredData){
             history = JSON.parse(prevStoredData);
@@ -43,43 +47,6 @@ function Dashboard() {
 
 
 
-    // useEffect   (() => {
-    //     binance.onopen = () => {
-    //         console.log("Connection established");
-    //     }
-    //     binance.onmessage =   (e) => {
-    //         const sd =  JSON.parse(e.data);
-    //         setseriesData(e.data);
-    //         console.log(JSON.parse(e.data));
-
-    //         const newData = {
-    //             open: parseFloat(sd.k.o),
-    //             high: parseFloat(sd.k.h),
-    //             low: parseFloat(sd.k.l),
-    //             close: parseFloat(sd.k.c),
-    //             time: sd.k.t
-    //         }
-
-    //         console.log("new ",newData);
-    //         setFormattedData([...formattedData,
-    //             newData
-    //         ])
-    //         console.log(formattedData);
-    //     }
-
-    // }, [binance.onmessage,binance])
-
-
-    // const handleIntervalChange = (e) => {
-    //     setInterval(e.target.value);
-    //     return handleSocketChange(symbol,interval);
-    //     //console.log(interval);
-    // }
-
-    // const handleSymbolChange = (e) => {
-    //     setSymbol(e.target.value);
-    //     //console.log(symbol);
-    // }
 
     let prev = null;
 
@@ -130,7 +97,7 @@ function Dashboard() {
     useEffect(
         () => {
 
-            //var binance = new WebSocket("wss://stream.binance.com:9443/ws/ethusdt@kline_1m")
+            
 
             var binance = handleSocketChange(symbol,interval);
             
@@ -150,9 +117,23 @@ function Dashboard() {
                 horzLines: { color: '#444' },
         },
                 width: chartContainerRef.current.clientWidth,
-                height: 800,
+                height: 720,
                 crosshair: {
                     mode: CrosshairMode.Normal,
+                    vertLine: {
+                        color: 'rgba(197, 203, 206, 0.8)',
+                        width: 1,
+                        style: 0,
+                        visible: true,
+                        labelBackgroundColor: 'rgba(197, 203, 206, 0.8)',
+                    },
+                    horzLine: {
+                        color: 'rgba(197, 203, 206, 0.8)',
+                        width: 1,
+                        style: 0,
+                        visible: true,
+                        labelBackgroundColor: 'rgba(197, 203, 206, 0.8)',
+                    },
                 },
                 priceScale: {
                     borderColor: 'rgba(197, 203, 206, 0.8)',
@@ -175,8 +156,39 @@ function Dashboard() {
             if (historicalData) {
                 series.setData(historicalData);
             }
-            //series.setData(formattedData);
-            chart.timeScale().fitContent();
+
+            chart.priceScale("right").applyOptions({
+                borderColor: "rgba(197, 203, 206, 0.8)",
+            })
+
+            chart.timeScale().applyOptions({
+                rightOffset: 20,
+                barSpacing: 15,
+                fixLeftEdge: true,
+                // tickMarkFormatter: (time,TickMarkType,locale) => {
+                //     const date = new Date(time*1000);
+                //     switch(TickMarkType){
+                //         case TickMarkType.Year:
+                //             return date.getFullYear();
+                //         case TickMarkType.Month:
+                //             {const monthFormatter = new Intl.DateTimeFormat(locale, { month: "short" });
+                //             return monthFormatter.format(date);}
+                //         case TickMarkType.DayOfMonth:
+                //             return date.getDate();
+                //         case TickMarkType.Time:
+                //             {const timeFormatter = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "numeric" });
+                //             return timeFormatter.format(date);}
+                //         case TickMarkType.TimeWithSeconds:
+                //             {const timewithsecondsFormatter = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "numeric", second: "numeric" });
+                //             return timewithsecondsFormatter.format(date);}
+                //         default:
+                //             console.log("default");
+
+                //     }
+                // }
+            })
+            
+            //chart.timeScale().fitContent();
             chart.timeScale().scrollToPosition(5);
 
             binance.onopen = () => {
@@ -185,51 +197,30 @@ function Dashboard() {
             binance.onmessage =   (e) => {
             const sd =  JSON.parse(e.data);
             
-            //console.log(JSON.parse(e.data));
+
 
             const newData = {
                 open: parseFloat(sd.k.o),
                 high: parseFloat(sd.k.h),
                 low: parseFloat(sd.k.l),
                 close: parseFloat(sd.k.c),
-                time: (sd.k.t)/1000
+                time: (sd.k.t)/1000,
+                symbol: sd.s.toLowerCase(),
             }
-
+            if(newData.symbol===symbol){
+                setCurrentData(newData);
+            }
+            
             series.update(newData);
 
             console.log("new ",newData);
-            // setFormattedData([...formattedData,
-            //     newData
-            // ])
 
 
             StoreHistory(newData);
-            //history.push(newData);
-            //localStorage.removeItem("history");
-            //localStorage.setItem("history", JSON.stringify(history));
+
             console.log("history ",history);
-            //console.log(formattedData);
-            
         }
 
-
-            // simulate real-time data
-            // function* getNextRealtimeUpdate(realtimeData) {
-            //     for (const dataPoint of realtimeData) {
-            //         yield dataPoint;
-            //     }
-            //     return null;
-            // }
-            // const streamingDataProvider = getNextRealtimeUpdate(formattedData);
-
-            // const intervalID = setInterval(() => {
-            //     const update = streamingDataProvider.next();
-            //     if (update.done) {
-            //         clearInterval(intervalID);
-            //         return;
-            //     }
-            //     series.update(update.value);
-            // }, 600);
 
             window.addEventListener('resize', handleResize);
 
@@ -241,6 +232,10 @@ function Dashboard() {
         },
         [symbol,interval]
     );
+
+    useEffect(() => {
+        (currentData.close>currentData.open)?setPriceColor("green"):setPriceColor("red");
+    }, [currentData]);
 
     return (
         <div className="flex flex-row w-full h-svh text-white">
@@ -268,15 +263,31 @@ function Dashboard() {
 
             <div className="w-11/12 h-full bg-gray-800">
                 <div className="mixed-chart p-2 h-5/6">
-                    <div
+                    <div className='w-full h-full relative'
                         ref={chartContainerRef}
-                    />
+                    >
+                        <div id="priceDisplay" className='absolute top-4 left-4 z-50 border border-gray-200 text-left p-2 w-48 overflow-hidden bg-slate-800'>
+                            <h3 className='text-xl'>{symbol.toUpperCase()}</h3>
+
+                            {/* <h1 className="text-2xl font-bold"
+                                style={{color:priceColor}}
+                                >Price&nbsp;${currentData.close}
+                            </h1> */}
+                            
+                        </div>
+                    </div>
+                    {/* <div ref={tooltipRef}>
+                        <h3></h3>
+                    </div> */}
+
+                </div>
                     {/* <button className="inline-block px-6 py-2 duration-200 bg-gray-300 hover:bg-gray-600 rounded-lg" onClick={() => chart.timeScale().scrollToRealTime()}>
                         Go to realtime
                     </button> */}
                 </div>
             </div>
-        </div>
+       
+
 
     );
 }
