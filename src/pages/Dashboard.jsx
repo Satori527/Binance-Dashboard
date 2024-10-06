@@ -116,7 +116,7 @@ function Dashboard() {
             var binance = handleSocketChange(symbol,interval);
             
             const handleResize = () => {
-                chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+                chart.applyOptions({ width: chartContainerRef.current.clientWidth, height: chartContainerRef.current.clientHeight });
             };
 
             
@@ -131,7 +131,7 @@ function Dashboard() {
                 horzLines: { color: '#444' },
         },
                 width: chartContainerRef.current.clientWidth,
-                height: 720,
+                height: chartContainerRef.current.clientHeight,
                 crosshair: {
                     mode: CrosshairMode.Normal,
                     vertLine: {
@@ -252,8 +252,8 @@ function Dashboard() {
     }, [currentData]);
 
     return (
-        <div className="flex flex-row w-full h-svh text-white">
-            <div className="w-1/12 h-full bg-gray-700 flex flex-col gap-4 p-2">
+        <div className="flex flex-row w-full h-svh text-white pt-12">
+            <div className="w-2/12 h-full bg-gray-700 flex flex-col gap-4 p-2 pt-8">
                 <div className="flex flex-col gap-1">
                     <label htmlFor="coin">Coin</label>
                     <select id="coin" onChange={e=>setSymbol(e.target.value)} className='text-black'>
@@ -271,7 +271,7 @@ function Dashboard() {
                     </select>
                 </div>
                 <div className="flex flex-col gap-4 my-4 text-white">
-                        <button className=" px-6 py-2 duration-200 bg-indigo-400 hover:bg-indigo-500 rounded text-center flex items-center justify-center" onClick={handleClearHistoryCurrent}>
+                        <button className=" px-6 py-2 duration-200 bg-indigo-400 hover:bg-indigo-500 rounded text-center flex items-center justify-center font-bold shadow-md shadow-gray-700" onClick={handleClearHistoryCurrent}>
                             Delete History
                         </button>
                       
@@ -285,9 +285,9 @@ function Dashboard() {
                     
             </div>
 
-            <div className="w-11/12 h-full bg-gray-800">
-                <div className="mixed-chart p-2 h-5/6">
-                    <div className='w-full h-full relative'
+            <div className="w-10/12 h-full pt-4 bg-gray-800">
+                <div className="mixed-chart p-2 h-full">
+                    <div className='w-full h-full relative border border-zinc-600'
                         ref={chartContainerRef}
                     >
                         <div id="priceDisplay" className='absolute top-4 left-4 z-50 border border-gray-200 text-left p-2 w-48 overflow-hidden bg-slate-800'>
